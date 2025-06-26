@@ -124,12 +124,14 @@ export async function logFileAccess(req, traceData) {
     // Enhanced IP and user agent detection
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
+    const location = await getLocationFromIP(clientIP);
     
     // Create trace log with enhanced data
     const traceLog = new TraceLog({
       uploaderId: traceData.uploaderId,
       ip: clientIP,
       userAgent: userAgent,
+      location,
       otpUsed: traceData.otpUsed,
       fileName: traceData.fileName,
       fileId: traceData.fileId,
@@ -185,8 +187,11 @@ async function getLocationFromIP(ip) {
         timezone: data.time_zone?.id || 'Unknown'
       };
     }
+  else {
+      console.warn('⚠️ Location API returned error:', data.error);
+    }
   } catch (error) {
-    console.log('⚠️ Location lookup failed:', error.message);
+    console.error('❌ Location API fetch failed:', error.message);
   }
 
   return { country: 'Unknown', city: 'Unknown' };
