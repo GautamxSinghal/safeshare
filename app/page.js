@@ -22,6 +22,7 @@ export default function Home() {
     }
 
     const token = localStorage.getItem("safeshare_token");
+    console.log("token upload",token)
 
     // Supported file types
     const supportedTypes = [
