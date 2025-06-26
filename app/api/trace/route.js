@@ -162,29 +162,32 @@ export async function logFileAccess(req, traceData) {
 
 // Optional: Get location from IP (requires external service)
 async function getLocationFromIP(ip) {
-  // Skip for localhost or unknown IPs
-  if (ip === 'unknown' || ip === '::1' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+  if (
+    ip === 'unknown' ||
+    ip === '::1' ||
+    ip === '127.0.0.1' ||
+    ip.startsWith('192.168.') ||
+    ip.startsWith('10.')
+  ) {
     return { country: 'Local', city: 'Development' };
   }
-  
+
   try {
-    // Replace with your preferred IP geolocation service
-    const response = await fetch(`https://ipapi.co/${ip}/json/`, {
-      timeout: 3000 // 3 second timeout
-    });
-    
+    const response = await fetch(`https://api.ipapi.com/api/${ip}?access_key=f568ace3551e7062f063568b313636dd`);
+
     if (response.ok) {
       const data = await response.json();
+      console.log('🌍 Location data received:', data);
       return {
         country: data.country_name,
         city: data.city,
-        region: data.region,
-        timezone: data.timezone
+        region: data.region_name,
+        timezone: data.time_zone?.id || 'Unknown'
       };
     }
   } catch (error) {
     console.log('⚠️ Location lookup failed:', error.message);
   }
-  
+
   return { country: 'Unknown', city: 'Unknown' };
 }
